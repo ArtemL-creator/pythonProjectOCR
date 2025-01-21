@@ -11,8 +11,6 @@ from matplotlib import pyplot as plt
 from PIL import Image
 
 
-
-
 def auto_rotate_image(image):
     """
     Автоматическое определение ориентации текста и исправление поворота.
@@ -33,6 +31,7 @@ def auto_rotate_image(image):
     else:
         return image, 0
 
+
 def preprocess_image(image_path, output_path=None):
     # Загрузка изображения
     print(f"Загрузка изображения: {image_path}")
@@ -45,24 +44,6 @@ def preprocess_image(image_path, output_path=None):
 
     # Устранение шума и сглаживание
     blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-
-    # Бинаризация изображения
-    # _, binary = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-    #
-    # # Вычисление угла поворота текста
-    # coords = np.column_stack(np.where(binary > 0))
-    # angle = cv2.minAreaRect(coords)[-1]
-    #
-    # # Коррекция угла
-    # if angle < -45:
-    #     angle = -(90 + angle)
-    # else:
-    #     angle = -angle
-    #
-    # (h, w) = gray.shape[:2]
-    # center = (w // 2, h // 2)
-    # rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
-    # rotated = cv2.warpAffine(gray, rotation_matrix, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
 
     # Улучшение контрастности с помощью CLAHE
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
@@ -105,6 +86,7 @@ def preprocess_image(image_path, output_path=None):
     # plt.show()
     return auto_rotated
 
+
 def recognize_text(image):
     """
     Распознавание текста с помощью Tesseract.
@@ -119,11 +101,9 @@ def recognize_text(image):
     return text
 
 
-
 if __name__ == "__main__":
     print(cv2.__version__)
     input_image = str(Path('resources', 'input', '13_208.jpg'))
-    # input_image = Path('resources', 'input', '13_208.jpg')
     output_image = str(Path('resources', 'output', '13_208.jpg'))
 
     preprocessed_image = preprocess_image(input_image, output_image)
@@ -149,7 +129,6 @@ if __name__ == "__main__":
     else:
         print("OpenCV успешно открыл изображение.")
 
-
     # Распознавание текста
     print(f"Тип данных перед распознаванием текста: {type(preprocessed_image)}")
     recognized_text = recognize_text(preprocessed_image)
@@ -160,30 +139,4 @@ if __name__ == "__main__":
     # Сохранение текста в файл
     with open("recognized_text.txt", "w", encoding="utf-8") as text_file:
         text_file.write(recognized_text)
-
-
-    #
-    # if not isinstance(input_image, (cv2.UMat, cv2.Mat, type(cv2.imread('')))):
-    #     raise TypeError("Переданное изображение должно быть NumPy-массивом (numpy.ndarray)")
-
-
-
-    # try:
-    #     preprocessed_image = preprocess_image(input_image, output_image)
-    #     if isinstance(preprocessed_image, np.ndarray):  # Проверка типа
-    #         recognized_text = recognize_text(preprocessed_image)
-    #         print("Распознанный текст:")
-    #         print(recognized_text)
-    #
-    #         # Сохранение текста в файл
-    #         output_text = Path('resources', 'output', 'recognized_text.txt')
-    #         with open(output_text, "w", encoding="utf-8") as text_file:
-    #             text_file.write(recognized_text)
-    #         print(f"Текст успешно сохранён в файл: {output_text}")
-    #     else:
-    #         raise TypeError("Ошибка: preprocessed_image не является NumPy-массивом")
-    # except FileNotFoundError as e:
-    #     print(f"Ошибка: {e}")
-    # except Exception as e:
-    #     print(f"Произошла ошибка: {e}")
 
