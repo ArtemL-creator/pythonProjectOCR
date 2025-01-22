@@ -84,10 +84,10 @@ def data_generator(data, batch_size):
                     "label": padded_labels,
                     "input_length": input_lengths,
                     "label_length": label_lengths,
-                }
-                # ,
-                # np.zeros(len(images)),  # Заглушка для CTC Loss
+                },
+                np.zeros(len(images)),  # Заглушка для CTC Loss
             )
+
 
 
 def build_ctc_model():
@@ -138,9 +138,6 @@ if __name__ == "__main__":
 
     # Создание генераторов
     train_gen = data_generator(train_data, batch_size)
-    batch = next(train_gen)
-    for key, value in batch[0].items():
-        print(f"{key}: {value.shape}")
     val_gen = data_generator(test_data, batch_size)
 
     # Обучение
