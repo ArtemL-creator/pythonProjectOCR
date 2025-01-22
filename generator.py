@@ -1,25 +1,33 @@
 import random
+import tensorflow as tf
 from trdg.generators import GeneratorFromStrings
 from PIL import Image
 import numpy as np
 from pathlib import Path
-import csv  # Для сохранения меток
+import json
 
 if __name__ == "__main__":
-    # Тексты для генерации
-    russian_texts = [
-        "Автомобиль Москвич", "Быстрый урок", "Великая наука", "Гениальная идея",
-        "День рождения", "Единство природы", "Жаркий летний день", "Загадка века",
-        "Идеальный баланс", "Йога для тела", "Кулинарный шедевр", "Летний дождь",
-        "Магический лес", "Небо без облаков", "Океанская глубина", "Путеводная звезда",
-        "Радуга после дождя", "Сильный ветер", "Теплый огонь", "Удивительные приключения",
-        "Философия жизни", "Химия природы", "Цветочная поляна", "Чистая вода",
-        "Шумный город", "Щедрый урожай", "Энергия движения", "Южный ветер",
-        "Яркий рассвет", "Преображение мира", "Ритм жизни", "Секреты успеха",
-        "Эмоции и чувства", "Будущее технологий", "Тайна вселенной", "Далёкие звезды",
-        "Гармония души", "Сила мысли", "Секреты древних знаний", "Техники медитации",
-        "Звездный вечер", "Путь к вершинам"
-    ]
+    # Полный набор символов: буквы, цифры, знаки препинания
+    alphabet = (
+        "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
+        "абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
+        " ,.!?-—;:"
+    )
+
+
+    # Генерируем слова и фразы из символов
+    def generate_random_texts(count=500):
+        import random
+        texts = []
+        for _ in range(count):
+            length = random.randint(5, 20)  # Длина строки от 5 до 20 символов
+            text = "".join(random.choices(alphabet, k=length))
+            if text:  # Проверка, что строка не пустая
+                texts.append(text)
+        return texts
+
+
+    russian_texts = generate_random_texts(100)  # Генерация 100 случайных строк
 
     # Путь к шрифтам
     font_dir = Path('resources', 'russian_fonts')
@@ -33,12 +41,13 @@ if __name__ == "__main__":
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Путь для сохранения файла с метками
-    labels_path = output_dir / "labels.csv"
+    labels_path_json = output_dir / "labels.json"
+    labels = []
 
     # Генератор изображений
     generator = GeneratorFromStrings(
         strings=russian_texts,
-        count=350,
+        count=len(russian_texts),
         fonts=fonts,
         size=62,
         skewing_angle=85,  # Устанавливаем диапазон углов наклона (максимум ±85 градусов)
@@ -47,27 +56,25 @@ if __name__ == "__main__":
         background_type=2,  # Тип фона: 0 — белый, 1 — случайный цвет, 2 — случайное изображение
     )
 
-    # Открываем CSV для записи меток
-    with open(labels_path, mode='w', newline='', encoding='utf-8') as labels_file:
-        csv_writer = csv.writer(labels_file)
-        csv_writer.writerow(["image", "label"])  # Заголовок для CSV
+    for i, (image, text) in enumerate(generator):
+        if isinstance(image, np.ndarray):
+            pil_image = Image.fromarray(image)
+        else:
+            pil_image = image
 
-        # Генерация изображений и сохранение
-        for i, (image, text) in enumerate(generator):  # Генератор возвращает картинку и текст
-            if isinstance(image, np.ndarray):  # Если возвращён NumPy массив
-                pil_image = Image.fromarray(image)  # Конвертируем в PIL Image
-            else:
-                pil_image = image  # Используем напрямую, если это PIL Image
+        if not text:
+            print(f"Warning: Empty text for image_{i + 1:04d}")
+            continue
 
-            # Имя файла изображения
-            image_filename = f"image_{i + 1:04d}.jpg"
-            image_path = output_dir / image_filename
+        image_filename = f"image_{i + 1:04d}.jpg"
+        image_path = output_dir / image_filename
+        pil_image.save(image_path)
 
-            # Сохраняем изображение
-            pil_image.save(image_path)
+        # Сохраняем полный путь и метку
+        labels.append({"image": str(image_path), "label": text})
+        print(f"Сохранено: {image_path} с меткой '{text}'")
 
-            # Сохраняем метку в CSV
-            csv_writer.writerow([image_filename, text])
-            print(f"Сохранено: {image_path} с меткой '{text}'")
+    with open(labels_path_json, "w", encoding="utf-8") as f:
+        json.dump(labels, f, ensure_ascii=False, indent=4)
 
-    print(f"\nМетки сохранены в файл: {labels_path}")
+    print(f"\nМетки сохранены в файл: {labels_path_json}")
