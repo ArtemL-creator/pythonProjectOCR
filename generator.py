@@ -20,14 +20,14 @@ if __name__ == "__main__":
         import random
         texts = []
         for _ in range(count):
-            length = random.randint(5, 20)  # Длина строки от 5 до 20 символов
+            length = random.randint(3, 7)  # Длина строки
             text = "".join(random.choices(alphabet, k=length))
             if text:  # Проверка, что строка не пустая
                 texts.append(text)
         return texts
 
 
-    russian_texts = generate_random_texts(100)  # Генерация 100 случайных строк
+    russian_texts = generate_random_texts(10000)  # Генерация 100 случайных строк
 
     # Путь к шрифтам
     font_dir = Path('resources', 'russian_fonts')
