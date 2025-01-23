@@ -11,6 +11,20 @@ from matplotlib import pyplot as plt
 from PIL import Image
 
 
+def show_img(image, pre_img):
+    plt.figure(figsize=(15, 10))
+    plt.subplot(1, 2, 1)
+    plt.title("Исходное изображение")
+    plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+    plt.axis("off")
+
+    plt.subplot(1, 2, 2)
+    plt.title("Предобработанное изображение")
+    plt.imshow(pre_img, cmap="gray")
+    plt.axis("off")
+
+    plt.show()
+
 def auto_rotate_image(image):
     """
     Автоматическое определение ориентации текста и исправление поворота.
@@ -50,50 +64,27 @@ def preprocess_image(image_path, output_path=None):
     # enhanced = clahe.apply(rotated)
     enhanced = clahe.apply(blurred)
 
-    # Обрезка границ (опционально)
-    contours, _ = cv2.findContours(cv2.threshold(enhanced, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1],
-                                   cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    if contours:
-        largest_contour = max(contours, key=cv2.contourArea)
-        x, y, w, h = cv2.boundingRect(largest_contour)
-        cropped = enhanced[y:y + h, x:x + w]
-    else:
-        cropped = enhanced
-
     # Опциональный автоматический поворот на основе ориентации текста
     try:
-        auto_rotated, _ = auto_rotate_image(cropped)
+        auto_rotated, _ = auto_rotate_image(enhanced)
     except Exception as e:
         print(f"Ошибка автоматического поворота: {e}")
-        auto_rotated = cropped
+        auto_rotated = enhanced
 
     # Сохранение изображения, если указан output_path
     if output_path:
-        cv2.imwrite(str(output_path), auto_rotated)  # Преобразуем Path в строку
+        cv2.imwrite(str(output_path), enhanced)  # Преобразуем Path в строку
 
     # # Отображение результата
-    # plt.figure(figsize=(15, 10))
-    # plt.subplot(1, 2, 1)
-    # plt.title("Исходное изображение")
-    # plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-    # plt.axis("off")
-    #
-    # plt.subplot(1, 2, 2)
-    # plt.title("Предобработанное изображение")
-    # plt.imshow(auto_rotated, cmap="gray")
-    # plt.axis("off")
-    #
-    # plt.show()
-    return auto_rotated
+    show_img(image, enhanced)
+
+    return enhanced
 
 
 def recognize_text(image):
     """
     Распознавание текста с помощью Tesseract.
     """
-    # Проверим, что изображение в формате NumPy-массива
-    # if not isinstance(image, (cv2.UMat, cv2.Mat, type(cv2.imread('')))):
-    #     raise TypeError("Переданное изображение должно быть NumPy-массивом (numpy.ndarray)")
 
     # Настройки Tesseract
     custom_config = r'--psm 6'
@@ -102,9 +93,8 @@ def recognize_text(image):
 
 
 if __name__ == "__main__":
-    print(cv2.__version__)
-    input_image = str(Path('resources', 'input', '13_208.jpg'))
-    output_image = str(Path('resources', 'output', '13_208.jpg'))
+    input_image = str(Path('resources', 'input', '13_208_copy.jpg'))
+    output_image = str(Path('resources', 'output', '13_208_copy.jpg'))
 
     preprocessed_image = preprocess_image(input_image, output_image)
     cv2.imwrite(str(output_image), preprocessed_image)
@@ -116,22 +106,7 @@ if __name__ == "__main__":
         print(f"Тип данных перед распознаванием текста: {type(preprocessed_image)}")
         raise TypeError("Переданное изображение не является NumPy-массивом.")
 
-    converted_image = Path('resources', 'input', 'converted_13_208.jpg')
-
-    with Image.open(output_image) as img:
-        img = img.convert('RGB')
-        img.save(converted_image, format='JPEG')
-
-    # Открытие переконвертированного изображения с помощью OpenCV
-    image = cv2.imread(str(converted_image))
-    if image is None:
-        print("OpenCV всё ещё не может открыть изображение.")
-    else:
-        print("OpenCV успешно открыл изображение.")
-
     # Распознавание текста
-    print(f"Тип данных перед распознаванием текста: {type(preprocessed_image)}")
-    recognized_text = recognize_text(preprocessed_image)
     print("Распознанный текст:")
     print(recognized_text)
 
@@ -139,4 +114,3 @@ if __name__ == "__main__":
     # Сохранение текста в файл
     with open("recognized_text.txt", "w", encoding="utf-8") as text_file:
         text_file.write(recognized_text)
-

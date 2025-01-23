@@ -17,7 +17,7 @@ if __name__ == "__main__":
         import random
         texts = []
         for _ in range(count):
-            length = random.randint(3, 5)  # Длина строки
+            length = random.randint(3, 6)  # Длина строки
             text = "".join(random.choices(alphabet, k=length))
             if text:  # Проверка, что строка не пустая
                 texts.append(text)
@@ -46,8 +46,8 @@ if __name__ == "__main__":
         strings=russian_texts,
         count=len(russian_texts),
         fonts=fonts,
-        size=62,
-        skewing_angle=85,  # Устанавливаем диапазон углов наклона (максимум ±85 градусов)
+        size=42,
+        skewing_angle=15,  # Устанавливаем диапазон углов наклона
         random_skew=True,
         blur=1,  # Увеличиваем размытие
         background_type=2,  # Тип фона: 0 — белый, 1 — случайный цвет, 2 — случайное изображение
@@ -72,4 +72,3 @@ if __name__ == "__main__":
             gt_file.write(text)
 
         print(f"Сохранено: {image_path} с меткой '{text}'")
-
