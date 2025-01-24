@@ -5,8 +5,8 @@ from pathlib import Path
 
 if __name__ == "__main__":
     # Путь к директории с изображениями и метками
-    image_dir = Path('resources/data/train_images_for_ts')
-    output_dir = Path('resources/data/lstmf_files')  # Папка для .lstmf файлов
+    image_dir = Path('../resources/data/train_images_for_ts')
+    output_dir = Path('../resources/data/lstmf_files')  # Папка для .lstmf файлов
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Список изображений в формате .tif
@@ -17,7 +17,7 @@ if __name__ == "__main__":
         exit(1)
 
     # Проверяем наличие Tesseract
-    if not shutil.which("tesseract"):
+    if not shutil.which("../tesseract"):
         print("Tesseract не установлен или не доступен в PATH.")
         exit(1)
 

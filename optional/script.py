@@ -2,13 +2,13 @@ import glob
 
 if __name__ == "__main__":
     # Путь к папке с файлами
-    input_dir = "resources/data/train_images_for_ts"
+    input_dir = "../resources/data/train_images_for_ts"
 
     # Список всех файлов .box
     files = glob.glob(input_dir + "/*.box")
 
     # Выходной файл для объединения всех символов
-    output_box_file = "resources/data/tessdata/all_symbols.box"
+    output_box_file = "../resources/data/tessdata/all_symbols.box"
 
     # Открываем файл для записи
     with open(output_box_file, 'w', encoding='utf-8') as output_file:

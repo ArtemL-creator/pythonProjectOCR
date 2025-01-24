@@ -34,7 +34,7 @@ if __name__ == "__main__":
         raise FileNotFoundError(f"В папке {font_dir} не найдено файлов шрифтов (*.ttf)")
 
     # Папка для сохранения изображений
-    output_dir = Path('resources', 'data', 'train_images_for_ts')
+    output_dir = Path('data', 'my_model-ground-truth')
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Генератор изображений

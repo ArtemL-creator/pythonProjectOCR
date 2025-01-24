@@ -1,11 +1,11 @@
 from pathlib import Path
 
 if __name__ == "__main__":
-    lstmf_dir = Path('resources/data/lstmf_files')
+    lstmf_dir = Path('../resources/data/lstmf_files')
     # train_listfile = lstmf_txt / "training_files.txt"
-    train_listfile = Path('resources/data/lstmf_txt/training_files.txt')
+    train_listfile = Path('../resources/data/lstmf_txt/training_files.txt')
     # eval_listfile = lstmf_txt / "evaluation_files.txt"
-    eval_listfile = Path('resources/data/lstmf_txt/evaluation_files.txt')
+    eval_listfile = Path('../resources/data/lstmf_txt/evaluation_files.txt')
 
     # Получаем список всех .lstmf файлов
     lstmf_files = list(lstmf_dir.glob("*.lstmf"))

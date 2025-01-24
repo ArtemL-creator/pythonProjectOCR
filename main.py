@@ -1,14 +1,9 @@
 import os
 from pathlib import Path
 
-import tensorflow as tf
-# from tensorflow.keras.utils import Sequence
-
 import cv2
-import numpy as np
 import pytesseract
 from matplotlib import pyplot as plt
-from PIL import Image
 
 
 def show_img(image, pre_img):
@@ -24,6 +19,7 @@ def show_img(image, pre_img):
     plt.axis("off")
 
     plt.show()
+
 
 def auto_rotate_image(image):
     """
@@ -61,19 +57,18 @@ def preprocess_image(image_path, output_path=None):
 
     # Улучшение контрастности с помощью CLAHE
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-    # enhanced = clahe.apply(rotated)
     enhanced = clahe.apply(blurred)
 
     # Опциональный автоматический поворот на основе ориентации текста
     try:
         auto_rotated, _ = auto_rotate_image(enhanced)
     except Exception as e:
-        print(f"Ошибка автоматического поворота: {e}")
+        # print(f"Ошибка автоматического поворота: {e}")
         auto_rotated = enhanced
 
     # Сохранение изображения, если указан output_path
     if output_path:
-        cv2.imwrite(str(output_path), enhanced)  # Преобразуем Path в строку
+        cv2.imwrite(str(output_path), enhanced)
 
     # # Отображение результата
     show_img(image, enhanced)
@@ -85,26 +80,32 @@ def recognize_text(image):
     """
     Распознавание текста с помощью Tesseract.
     """
+    # Обычное разбиение на блоки текста (по умолчанию --psm 3)
+    # Устанавливаем переменную окружения для Tesseract
+    # os.environ['TESSDATA_PREFIX'] = r'tesseract/tessdata'
+    os.environ['TESSDATA_PREFIX'] = r'tesstrain/data'
 
-    # Настройки Tesseract
-    custom_config = r'--psm 6'
-    text = pytesseract.image_to_string(image, lang='rus', config=custom_config)
+    # Убедимся, что переменная окружения установлена
+    tessdata_prefix = os.environ.get('TESSDATA_PREFIX')
+    if tessdata_prefix is None:
+        print("Переменная окружения TESSDATA_PREFIX не установлена.")
+        return
+
+    print(f"Переменная окружения TESSDATA_PREFIX установлена: {tessdata_prefix}")
+
+    text = pytesseract.image_to_string(image, lang='my_model', config='--psm 13')
     return text
 
 
 if __name__ == "__main__":
     input_image = str(Path('resources', 'input', '13_208_copy.jpg'))
     output_image = str(Path('resources', 'output', '13_208_copy.jpg'))
+    # Путь к tesseract
 
     preprocessed_image = preprocess_image(input_image, output_image)
     cv2.imwrite(str(output_image), preprocessed_image)
 
-    if isinstance(preprocessed_image, np.ndarray):
-        print("Тип данных перед распознаванием текста: NumPy-массив")
-        recognized_text = recognize_text(preprocessed_image)
-    else:
-        print(f"Тип данных перед распознаванием текста: {type(preprocessed_image)}")
-        raise TypeError("Переданное изображение не является NumPy-массивом.")
+    recognized_text = recognize_text(preprocessed_image)
 
     # Распознавание текста
     print("Распознанный текст:")
@@ -112,5 +113,5 @@ if __name__ == "__main__":
 
     output_text = Path('resources', 'output', 'text.txt')
     # Сохранение текста в файл
-    with open("recognized_text.txt", "w", encoding="utf-8") as text_file:
+    with open('data/recognized_text.txt', "w", encoding="utf-8") as text_file:
         text_file.write(recognized_text)
