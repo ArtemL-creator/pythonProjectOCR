@@ -93,13 +93,13 @@ def recognize_text(image):
 
     print(f"Переменная окружения TESSDATA_PREFIX установлена: {tessdata_prefix}")
 
-    text = pytesseract.image_to_string(image, lang='my_model', config='--psm 13')
+    text = pytesseract.image_to_string(image, lang='my_model', config='--psm 6')
     return text
 
 
 if __name__ == "__main__":
-    input_image = str(Path('resources', 'input', '13_208_copy.jpg'))
-    output_image = str(Path('resources', 'output', '13_208_copy.jpg'))
+    input_image = str(Path('resources', 'input', '13_388_copy.jpg'))
+    output_image = str(Path('resources', 'output', '13_388_copy.jpg'))
     # Путь к tesseract
 
     preprocessed_image = preprocess_image(input_image, output_image)

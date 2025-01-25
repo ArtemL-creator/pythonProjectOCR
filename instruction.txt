@@ -1,6 +1,6 @@
 combine_tessdata -e resources/data/tessdata/rus.traineddata resources/data/tessdata/rus.lstm
 
-unicharset_extractor --output_unicharset resources/data/script_dir/my.unicharset --norm_mode 2 resources/data/tessdata/all_symbols.box
+
 # set_unicharset_properties -U resources/data/tessdata/my.unicharset -O resources/data/tessdata/my_fixed.unicharset --script_dir=resources/data/tessdata
 
 
@@ -10,5 +10,7 @@ lstmtraining --model_output resources/data/output/ --continue_from resources/dat
 
 
 5.x.x.
+
+$ unicharset_extractor --output_unicharset resources/data/script_dir/my.unicharset --norm_mode 2 resources/data/tessdata/all_symbols.box
 
 $ TESSDATA_PREFIX=../tesseract/tessdata make training MODEL_NAME=my_model START_MODEL=rus TESSDATA=../tesseract/tessdata LANGUAGES=rus MAX_ITERATIONS=10000
